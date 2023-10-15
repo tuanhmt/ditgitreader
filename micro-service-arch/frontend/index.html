@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <!-- Content within the centered container -->
+                <h1>Digit Reader</h1>
+            </br>
+                <!-- Image preview container -->
+                <div id="image-preview" class="mb-3">
+                    <img src="#" height="200" width="200" alt="Image Preview" class="img-fluid">
+                </div>
+            </br>
+                
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Choose an image:</label>
+                        <input type="file" class="form-control" name="image" id="image" accept="image/*" onchange="previewImage(this)">
+                    </div>
+                </br>
+                   <div class="row">
+                    <button type="submit" onclick="doUpload()" class="btn btn-primary">Upload Image</button>
+                    <button type="submit" onclick="doTranslator()" class="btn btn-primary">Translate Text to Bangla</button>
+                    <button type="submit"  id="playButton" class="btn btn-primary">Text To Speech</button>
+                   </div>
+                </br>
+                <div class="col-9">
+                    <audio id="audioPlayer" controls>
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                
+                    
+            
+            </div>
+            
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // JavaScript for image preview
+        function previewImage(input) {
+            var preview = document.getElementById('image-preview');
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.querySelector('img').src = e.target.result;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function doUpload(){
+            var files=document.getElementById('image').files
+            if(!files){
+                return
+            }
+
+            var xhr=new XMLHttpRequest()
+            xhr.onreadystatechange=function(){
+                if (xhr.readyState!==4){
+                    return
+                }
+                localStorage.setItem('predict-data', xhr.responseText);
+                alert(xhr.status+': '+ localStorage.getItem('predict-data'))
+               
+            }
+            xhr.open('POST','http://text-to-speed:8081/read-image')
+            xhr.send(files[0])
+        }
+        function doTextToSpeech(){
+            var files=document.getElementById('image').files
+            if(!files){
+                return
+            }
+
+            var xhr=new XMLHttpRequest()
+            xhr.onreadystatechange=function(){
+                if (xhr.readyState!==4){
+                    return
+                }
+                alert(xhr.status+': '+xhr.responseText)
+            }
+            xhr.open('POST','/read-image')
+            xhr.send(files[0])
+        }
+        function doTranslator(){
+            var xhr=new XMLHttpRequest()
+            xhr.onreadystatechange=function(){
+                if (xhr.readyState!==4){
+                    return
+                }
+                alert(xhr.status+': '+xhr.responseText)
+            }
+            xhr.open('POST','http://localhost:8080/text-to-speech')
+            console.log(localStorage.getItem('predict-data'))
+            xhr.send(localStorage.getItem('predict-data'))
+        }
+ 
+        //play sound
+
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+    
+        playButton.addEventListener('click', () => {
+        // Replace 'your_api_endpoint_here' with the actual API endpoint
+        fetch('http://localhost:8080/text-to-speech', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'audio/mpeg',
+            },
+            body: localStorage.getItem('predict-data'),
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const objectURL = URL.createObjectURL(blob);
+                audioPlayer.src = objectURL; // Set the MP3 file as the source
+                audioPlayer.play(); // Play the audio
+            })
+            .catch(error => {
+                console.error('Error fetching MP3 file:', error);
+            });
+    });
+    </script>
+
+</body>
+</html> 

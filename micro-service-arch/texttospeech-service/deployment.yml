@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: text-to-speed-service
+  name: text-to-speed-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: text-to-speed-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: text-to-speed-service
+    spec:
+      containers:
+      - image: tuanhmt/text-to-speed-service:v1.2
+        name: text-to-speed-service
+        imagePullPolicy: Always
+        resources: {}
+status: {}

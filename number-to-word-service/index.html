@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        function numberToWords(){
+            var number=document.getElementById('number').value
+
+            var xhr=new XMLHttpRequest()
+            xhr.onreadystatechange=function(){
+                if (xhr.readyState!==4){
+                    return
+                }
+                alert(xhr.status+': '+xhr.responseText)
+            }
+            xhr.open('POST','/number-to-words')
+            xhr.send(number)
+        }
+    </script>
+</head>
+<body>
+    Number: <input type="text" name="number" id="number" placeholder="0"/>
+    <button onclick="numberToWords()">Get words</button>
+</body>
+</html>
